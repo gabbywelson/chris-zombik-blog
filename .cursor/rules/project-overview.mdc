@@ -1,0 +1,90 @@
+---
+description: Project overview and architecture for Chris Zombik's author portfolio
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Chris Zombik Author Portfolio
+
+A portfolio website for a fantasy and non-fiction author, built with Next.js 15 and Payload CMS 3.
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **CMS**: Payload CMS 3.x
+- **Database**: PostgreSQL via NeonDB
+- **Storage**: Vercel Blob Storage
+- **Styling**: Tailwind CSS with custom typography
+- **Deployment**: Vercel
+
+## Design System
+
+### Typography
+
+- **Headings**: Cormorant Garamond (serif) - elegant, literary feel
+- **Body**: Merriweather (serif) - optimized for reading
+- CSS variables: `--font-heading` and `--font-body`
+- Tailwind classes: `font-serif` (headings), `font-body` (body text)
+
+### Color Palette
+
+**Light theme** (warm parchment):
+- Background: cream (#FDFBF7)
+- Foreground: soft charcoal (#2D2D2D)
+- Accents: warm browns and earth tones
+
+**Dark theme** (warm evening):
+- Background: deep charcoal (#1a1a18)
+- Foreground: warm cream (#F5F2EB)
+
+## Content Structure
+
+### Collections
+
+| Collection | Purpose |
+|------------|---------|
+| `Pages` | Static pages (Home, About, Contact) |
+| `Posts` | Blog posts with hero images |
+| `ShortStories` | Fiction pieces optimized for reading |
+| `Media` | Images and files |
+| `Categories` | Post/story categorization |
+| `Users` | Admin users |
+
+### Globals
+
+- `Header`: Navigation items
+- `Footer`: Nav items + social links
+
+### Blocks (for page layouts)
+
+- `AuthorHero`: Two-column hero with image and bio
+- `LatestWorks`: Recent short stories grid
+- `RecentPosts`: Recent blog posts grid
+- `Content`: Rich text content
+- `CallToAction`: CTA sections
+- `MediaBlock`: Image/video blocks
+
+## File Structure
+
+```
+src/
+├── app/(frontend)/     # Public pages
+│   ├── posts/          # Blog archive and individual posts
+│   ├── short-stories/  # Fiction archive and reading pages
+│   └── [slug]/         # Dynamic pages from CMS
+├── app/(payload)/      # Payload admin
+├── blocks/             # Reusable page blocks
+├── collections/        # Payload collection configs
+├── components/         # React components
+├── heros/              # Hero section variants
+├── migrations/         # Database migrations
+└── utilities/          # Helper functions
+```
+
+## Key Conventions
+
+1. **Server Components by default** - Use `'use client'` only when needed
+2. **Payload queries** - Use `payload.find()` with `select` to limit fields
+3. **Image handling** - Prefer `heroImage` field, fallback to `meta.image`
+4. **Revalidation** - Collection hooks call `revalidatePath()` / `revalidateTag()`
+5. **Styling** - Use Tailwind utilities, avoid custom CSS unless necessary

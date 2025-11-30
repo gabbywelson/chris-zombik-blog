@@ -64,6 +64,9 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
+    // Disable auto-pushing schema changes - use migrations only
+    // This prevents dev mode from polluting the migration history
+    push: process.env.NODE_ENV === 'development' && process.env.PAYLOAD_PUSH !== 'false',
   }),
   collections: [Pages, Posts, ShortStories, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),

@@ -1,0 +1,100 @@
+---
+description: Best practices for Payload CMS database migrations and deployment
+globs: ["src/payload.config.ts", "src/collections/**/*", "src/migrations/**/*", "package.json"]
+alwaysApply: false
+---
+
+# Payload CMS Migration Best Practices
+
+## Database Environment Separation
+
+This project uses **separate databases for development and production**:
+
+- **Development**: Use a local Postgres instance or a separate NeonDB branch
+- **Production**: The Vercel deployment connects to the primary NeonDB branch
+
+The `DATABASE_URL` environment variable controls which database is used.
+
+## Migration Workflow
+
+When making schema changes (adding/modifying Collections, Fields, Globals):
+
+1. **Stop the dev server** before creating migrations
+2. **Create a migration file**:
+   ```bash
+   pnpm payload migrate:create descriptive_name_here
+   ```
+3. **Review the generated migration** in `src/migrations/`
+4. **Commit the migration file** to Git
+5. **Deploy**: Vercel runs `payload migrate` which applies pending migrations
+
+## Configuration
+
+The `push` option in `payload.config.ts` controls auto-schema updates:
+
+```typescript
+db: vercelPostgresAdapter({
+  pool: { connectionString: process.env.DATABASE_URL || '' },
+  // Only enable push in development, never in production
+  push: process.env.NODE_ENV === 'development' && process.env.PAYLOAD_PUSH !== 'false',
+}),
+```
+
+- **Development** (`push: true`): Schema changes sync automatically (convenient but doesn't create migrations)
+- **Production** (`push: false`): Only migration files can modify the schema (safe, trackable)
+
+## CI/CD Script
+
+The `ci` script in `package.json` runs migrations before building:
+
+```json
+"ci": "payload migrate && pnpm build"
+```
+
+## Common Issues & Solutions
+
+### "It looks like you've run Payload in dev mode"
+
+This prompt appears when the `payload_migrations` table contains a `dev` entry (batch -1). To fix:
+
+```bash
+psql $DATABASE_URL -c "DELETE FROM payload_migrations WHERE name = 'dev';"
+```
+
+### "type/relation already exists" during migration
+
+The schema was already applied (likely via dev mode push) but not tracked. Solutions:
+
+1. **Mark migration as run** (if data exists):
+   ```bash
+   psql $DATABASE_URL -c "INSERT INTO payload_migrations (name, batch) VALUES ('migration_name', 1);"
+   ```
+
+2. **Reset database** (if no critical data):
+   - Clear tables in NeonDB dashboard
+   - Redeploy to run migrations fresh
+
+### Check migration status
+
+```bash
+# See what migrations Payload knows about
+pnpm payload migrate:status
+
+# See what's in the database
+psql $DATABASE_URL -c "SELECT * FROM payload_migrations;"
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `PAYLOAD_PUSH` | Set to `false` to disable push even in dev |
+| `NODE_ENV` | `development` or `production` |
+
+## Never Do This
+
+- ❌ Use the same database for local dev and production
+- ❌ Run `pnpm dev` against the production database
+- ❌ Manually modify production database schema without migrations
+- ❌ Delete migration files after they've been applied to production
