@@ -65,6 +65,11 @@ export default buildConfig({
     // This prevents dev mode from polluting the migration history
     push: process.env.NODE_ENV === 'development' && process.env.PAYLOAD_PUSH !== 'false',
   }),
+  upload: {
+    limits: {
+      fileSize: 20000000, // 20MB, default is 4MB
+    },
+  },
   collections: [Pages, Posts, ShortStories, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],

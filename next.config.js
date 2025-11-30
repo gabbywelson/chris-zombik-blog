@@ -30,6 +30,9 @@ const nextConfig = {
     return webpackConfig
   },
   reactStrictMode: true,
+  serverActions: {
+    bodySizeLimit: '20mb',
+  },
   redirects,
 }
 
