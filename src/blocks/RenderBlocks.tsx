@@ -6,14 +6,18 @@ import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
+import { LatestWorksBlock } from '@/blocks/LatestWorks/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { RecentPostsBlock } from '@/blocks/RecentPosts/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
   formBlock: FormBlock,
+  latestWorks: LatestWorksBlock,
   mediaBlock: MediaBlock,
+  recentPosts: RecentPostsBlock,
 }
 
 export const RenderBlocks: React.FC<{

@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
-import { Logo } from '@/components/Logo/Logo'
 import { HeaderNav } from './Nav'
 
 interface HeaderClientProps {
@@ -30,11 +29,20 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   }, [headerTheme])
 
   return (
-    <header className="container relative z-20   " {...(theme ? { 'data-theme': theme } : {})}>
-      <div className="py-8 flex justify-between">
-        <Link href="/">
-          <Logo loading="eager" priority="high" className="invert dark:invert-0" />
+    <header
+      className="container relative z-20 border-b border-border/50"
+      {...(theme ? { 'data-theme': theme } : {})}
+    >
+      <div className="py-6 md:py-8 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12">
+        {/* Author Name / Logo */}
+        <Link
+          href="/"
+          className="font-serif text-2xl md:text-3xl font-medium tracking-wide hover:opacity-80 transition-opacity"
+        >
+          Chris Zombik
         </Link>
+
+        {/* Navigation */}
         <HeaderNav data={data} />
       </div>
     </header>

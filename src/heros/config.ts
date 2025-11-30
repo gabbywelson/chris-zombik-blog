@@ -35,6 +35,10 @@ export const hero: Field = {
           label: 'Low Impact',
           value: 'lowImpact',
         },
+        {
+          label: 'Author Hero',
+          value: 'authorHero',
+        },
       ],
       required: true,
     },
@@ -52,6 +56,38 @@ export const hero: Field = {
         },
       }),
       label: false,
+      admin: {
+        condition: (_, { type } = {}) => type !== 'authorHero',
+      },
+    },
+    {
+      name: 'authorBio',
+      type: 'richText',
+      label: 'Author Bio',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3'] }),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+          ]
+        },
+      }),
+      admin: {
+        condition: (_, { type } = {}) => type === 'authorHero',
+        description: 'Introduction and bio displayed next to the author photo',
+      },
+    },
+    {
+      name: 'authorImage',
+      type: 'upload',
+      label: 'Author Photo',
+      relationTo: 'media',
+      admin: {
+        condition: (_, { type } = {}) => type === 'authorHero',
+        description: 'Professional headshot or author photo',
+      },
     },
     linkGroup({
       overrides: {

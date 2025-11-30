@@ -94,8 +94,9 @@ const config = {
         warning: 'hsl(var(--warning))',
       },
       fontFamily: {
-        mono: ['var(--font-geist-mono)'],
-        sans: ['var(--font-geist-sans)'],
+        serif: ['var(--font-heading)', 'Georgia', 'Cambria', 'serif'],
+        body: ['var(--font-body)', 'Georgia', 'serif'],
+        sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         'accordion-down': {
@@ -113,9 +114,16 @@ const config = {
             {
               '--tw-prose-body': 'var(--text)',
               '--tw-prose-headings': 'var(--text)',
+              'h1, h2, h3, h4, h5, h6': {
+                fontFamily: 'var(--font-heading), Georgia, serif',
+                fontWeight: '600',
+              },
               h1: {
-                fontWeight: 'normal',
+                fontWeight: '500',
                 marginBottom: '0.25em',
+              },
+              p: {
+                lineHeight: '1.8',
               },
             },
           ],
@@ -127,8 +135,11 @@ const config = {
                 fontSize: '2.5rem',
               },
               h2: {
+                fontSize: '1.5rem',
+                fontWeight: '600',
+              },
+              h3: {
                 fontSize: '1.25rem',
-                fontWeight: 600,
               },
             },
           ],
@@ -140,6 +151,9 @@ const config = {
                 fontSize: '3.5rem',
               },
               h2: {
+                fontSize: '1.75rem',
+              },
+              h3: {
                 fontSize: '1.5rem',
               },
             },

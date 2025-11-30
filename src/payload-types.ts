@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     pages: Page;
     posts: Post;
+    'short-stories': ShortStory;
     media: Media;
     categories: Category;
     users: User;
@@ -91,6 +92,7 @@ export interface Config {
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    'short-stories': ShortStoriesSelect<false> | ShortStoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -157,7 +159,7 @@ export interface Page {
   id: number;
   title: string;
   hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'authorHero';
     richText?: {
       root: {
         type: string;
@@ -173,6 +175,28 @@ export interface Page {
       };
       [k: string]: unknown;
     } | null;
+    /**
+     * Introduction and bio displayed next to the author photo
+     */
+    authorBio?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Professional headshot or author photo
+     */
+    authorImage?: (number | null) | Media;
     links?:
       | {
           link: {
@@ -199,7 +223,15 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | LatestWorksBlock
+    | RecentPostsBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -209,56 +241,6 @@ export interface Page {
     description?: string | null;
   };
   publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
- */
-export interface Post {
-  id: number;
-  title: string;
-  heroImage?: (number | null) | Media;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  authors?: (number | User)[] | null;
-  populatedAuthors?:
-    | {
-        id?: string | null;
-        name?: string | null;
-      }[]
-    | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -386,6 +368,56 @@ export interface FolderInterface {
   folderType?: 'media'[] | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  heroImage?: (number | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (number | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -780,6 +812,80 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LatestWorksBlock".
+ */
+export interface LatestWorksBlock {
+  heading?: string | null;
+  /**
+   * Optional introductory text below the heading
+   */
+  description?: string | null;
+  count?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'latestWorks';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RecentPostsBlock".
+ */
+export interface RecentPostsBlock {
+  heading?: string | null;
+  /**
+   * Optional introductory text below the heading
+   */
+  description?: string | null;
+  count?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'recentPosts';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "short-stories".
+ */
+export interface ShortStory {
+  id: number;
+  title: string;
+  /**
+   * A brief summary for display on listing pages
+   */
+  summary?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -977,6 +1083,10 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
+        relationTo: 'short-stories';
+        value: number | ShortStory;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1061,6 +1171,8 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         type?: T;
         richText?: T;
+        authorBio?: T;
+        authorImage?: T;
         links?:
           | T
           | {
@@ -1086,6 +1198,8 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        latestWorks?: T | LatestWorksBlockSelect<T>;
+        recentPosts?: T | RecentPostsBlockSelect<T>;
       };
   meta?:
     | T
@@ -1187,6 +1301,28 @@ export interface FormBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LatestWorksBlock_select".
+ */
+export interface LatestWorksBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  count?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RecentPostsBlock_select".
+ */
+export interface RecentPostsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  count?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -1210,6 +1346,28 @@ export interface PostsSelect<T extends boolean = true> {
         id?: T;
         name?: T;
       };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "short-stories_select".
+ */
+export interface ShortStoriesSelect<T extends boolean = true> {
+  title?: T;
+  summary?: T;
+  content?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  publishedAt?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -1683,6 +1841,26 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  socialLinks?:
+    | {
+        platform:
+          | 'twitter'
+          | 'instagram'
+          | 'bluesky'
+          | 'threads'
+          | 'facebook'
+          | 'goodreads'
+          | 'amazon'
+          | 'website'
+          | 'linkedin'
+          | 'youtube';
+        /**
+         * Full URL including https://
+         */
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1728,6 +1906,13 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1748,6 +1933,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'posts';
           value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'short-stories';
+          value: number | ShortStory;
         } | null);
     global?: string | null;
     user?: (number | null) | User;
