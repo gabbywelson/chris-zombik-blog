@@ -30,10 +30,10 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
   return (
     <header
-      className="container relative z-20 border-b border-border/50 bg-background"
+      className="relative z-20 border-b border-border/50 bg-background text-foreground"
       {...(theme ? { 'data-theme': theme } : {})}
     >
-      <div className="py-6 md:py-8 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12">
+      <div className="container py-6 md:py-8 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12">
         {/* Author Name / Logo */}
         <Link
           href="/"
