@@ -7,6 +7,7 @@ import type { Header as HeaderType } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import Link from 'next/link'
 import { SearchIcon } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
@@ -23,13 +24,11 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
           />
         )
       })}
-      <Link
-        href="/search"
-        className="text-foreground/70 hover:text-foreground transition-colors"
-      >
+      <Link href="/search" className="text-foreground/70 hover:text-foreground transition-colors">
         <span className="sr-only">Search</span>
         <SearchIcon className="w-4 h-4 md:w-5 md:h-5" />
       </Link>
+      <ThemeToggle />
     </nav>
   )
 }

@@ -4,7 +4,6 @@ import React from 'react'
 
 import type { Footer } from '@/payload-types'
 
-import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { CMSLink } from '@/components/Link'
 import {
   Twitter,
@@ -88,7 +87,6 @@ export async function Footer() {
 
           {/* Theme Selector & Copyright */}
           <div className="flex flex-col items-center gap-4 pt-4 border-t border-border/50 w-full max-w-md">
-            <ThemeSelector />
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} All rights reserved.
             </p>
