@@ -24,6 +24,7 @@ export const RecentPostsBlock: React.FC<RecentPostsBlockType> = async ({
       title: true,
       slug: true,
       categories: true,
+      heroImage: true,
       meta: true,
     },
     where: {

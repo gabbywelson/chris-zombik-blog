@@ -23,6 +23,7 @@ export default async function Page() {
       title: true,
       slug: true,
       categories: true,
+      heroImage: true,
       meta: true,
     },
   })
@@ -58,6 +59,6 @@ export default async function Page() {
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Payload Website Template Posts`,
+    title: 'Posts | Chris Zombik',
   }
 }
