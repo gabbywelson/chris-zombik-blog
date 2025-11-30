@@ -1,6 +1,6 @@
 ---
 description: Project overview and architecture for Chris Zombik's author portfolio
-globs: ["**/*"]
+globs: ['**/*']
 alwaysApply: true
 ---
 
@@ -29,11 +29,13 @@ A portfolio website for a fantasy and non-fiction author, built with Next.js 15 
 ### Color Palette
 
 **Light theme** (warm parchment):
+
 - Background: cream (#FDFBF7)
 - Foreground: soft charcoal (#2D2D2D)
 - Accents: warm browns and earth tones
 
 **Dark theme** (warm evening):
+
 - Background: deep charcoal (#1a1a18)
 - Foreground: warm cream (#F5F2EB)
 
@@ -41,14 +43,14 @@ A portfolio website for a fantasy and non-fiction author, built with Next.js 15 
 
 ### Collections
 
-| Collection | Purpose |
-|------------|---------|
-| `Pages` | Static pages (Home, About, Contact) |
-| `Posts` | Blog posts with hero images |
+| Collection     | Purpose                              |
+| -------------- | ------------------------------------ |
+| `Pages`        | Static pages (Home, About, Contact)  |
+| `Posts`        | Blog posts with hero images          |
 | `ShortStories` | Fiction pieces optimized for reading |
-| `Media` | Images and files |
-| `Categories` | Post/story categorization |
-| `Users` | Admin users |
+| `Media`        | Images and files                     |
+| `Categories`   | Post/story categorization            |
+| `Users`        | Admin users                          |
 
 ### Globals
 

@@ -1,6 +1,6 @@
 ---
 description: Best practices for Payload CMS database migrations and deployment
-globs: ["src/payload.config.ts", "src/collections/**/*", "src/migrations/**/*", "package.json"]
+globs: ['src/payload.config.ts', 'src/collections/**/*', 'src/migrations/**/*', 'package.json']
 alwaysApply: false
 ---
 
@@ -66,6 +66,7 @@ psql $DATABASE_URL -c "DELETE FROM payload_migrations WHERE name = 'dev';"
 The schema was already applied (likely via dev mode push) but not tracked. Solutions:
 
 1. **Mark migration as run** (if data exists):
+
    ```bash
    psql $DATABASE_URL -c "INSERT INTO payload_migrations (name, batch) VALUES ('migration_name', 1);"
    ```
@@ -86,11 +87,11 @@ psql $DATABASE_URL -c "SELECT * FROM payload_migrations;"
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
+| Variable       | Description                                |
+| -------------- | ------------------------------------------ |
+| `DATABASE_URL` | PostgreSQL connection string               |
 | `PAYLOAD_PUSH` | Set to `false` to disable push even in dev |
-| `NODE_ENV` | `development` or `production` |
+| `NODE_ENV`     | `development` or `production`              |
 
 ## Never Do This
 
