@@ -37,3 +37,4 @@ export function FootnotesSection({ footnotes, className = '' }: Props) {
     </section>
   )
 }
+

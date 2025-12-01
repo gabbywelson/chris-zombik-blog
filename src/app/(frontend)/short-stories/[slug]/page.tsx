@@ -15,6 +15,9 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import Link from 'next/link'
 
+export const dynamic = 'force-static'
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const stories = await payload.find({

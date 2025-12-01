@@ -2,37 +2,45 @@ import React from 'react'
 import Link from 'next/link'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
 
 import type { RecentPostsBlock as RecentPostsBlockType } from '@/payload-types'
 
 import { Card } from '@/components/Card'
+
+const getCachedPosts = unstable_cache(
+  async (limit: number) => {
+    const payload = await getPayload({ config: configPromise })
+    return payload.find({
+      collection: 'posts',
+      depth: 1,
+      limit,
+      overrideAccess: false,
+      sort: '-publishedAt',
+      select: {
+        title: true,
+        slug: true,
+        categories: true,
+        heroImage: true,
+        meta: true,
+      },
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
+    })
+  },
+  ['recent-posts'],
+  { tags: ['posts'], revalidate: 3600 }
+)
 
 export const RecentPostsBlock: React.FC<RecentPostsBlockType> = async ({
   heading,
   description,
   count = 3,
 }) => {
-  const payload = await getPayload({ config: configPromise })
-
-  const posts = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit: count || 3,
-    overrideAccess: false,
-    sort: '-publishedAt',
-    select: {
-      title: true,
-      slug: true,
-      categories: true,
-      heroImage: true,
-      meta: true,
-    },
-    where: {
-      _status: {
-        equals: 'published',
-      },
-    },
-  })
+  const posts = await getCachedPosts(count || 3)
 
   if (!posts.docs || posts.docs.length === 0) {
     return null

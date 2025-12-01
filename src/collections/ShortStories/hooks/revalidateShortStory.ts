@@ -17,6 +17,7 @@ export const revalidateShortStory: CollectionAfterChangeHook<ShortStory> = ({
 
       revalidatePath(path)
       revalidateTag('short-stories-sitemap')
+      revalidateTag('short-stories') // Invalidate LatestWorksBlock cache
     }
 
     // If the story was previously published, we need to revalidate the old path
@@ -27,6 +28,7 @@ export const revalidateShortStory: CollectionAfterChangeHook<ShortStory> = ({
 
       revalidatePath(oldPath)
       revalidateTag('short-stories-sitemap')
+      revalidateTag('short-stories') // Invalidate LatestWorksBlock cache
     }
   }
   return doc
@@ -41,6 +43,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<ShortStory> = ({
 
     revalidatePath(path)
     revalidateTag('short-stories-sitemap')
+    revalidateTag('short-stories') // Invalidate LatestWorksBlock cache
   }
 
   return doc

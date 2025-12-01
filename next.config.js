@@ -52,6 +52,18 @@ const nextConfig = {
     bodySizeLimit: '20mb',
   },
   redirects,
+  headers: async () => [
+    {
+      // Apply to all frontend pages (exclude admin and API routes)
+      source: '/((?!admin|api).*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+        },
+      ],
+    },
+  ],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })

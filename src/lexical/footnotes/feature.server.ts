@@ -27,3 +27,4 @@ export const FootnoteFeature = createServerFeature({
   },
   key: 'footnote',
 })
+

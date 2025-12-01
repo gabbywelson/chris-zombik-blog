@@ -2,30 +2,38 @@ import React from 'react'
 import Link from 'next/link'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
 
 import type { LatestWorksBlock as LatestWorksBlockType } from '@/payload-types'
 
 import { StoryCard } from '@/components/StoryCard'
+
+const getCachedStories = unstable_cache(
+  async (limit: number) => {
+    const payload = await getPayload({ config: configPromise })
+    return payload.find({
+      collection: 'short-stories',
+      depth: 1,
+      limit,
+      overrideAccess: false,
+      sort: '-publishedAt',
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
+    })
+  },
+  ['latest-works'],
+  { tags: ['short-stories'], revalidate: 3600 }
+)
 
 export const LatestWorksBlock: React.FC<LatestWorksBlockType> = async ({
   heading,
   description,
   count = 3,
 }) => {
-  const payload = await getPayload({ config: configPromise })
-
-  const stories = await payload.find({
-    collection: 'short-stories',
-    depth: 1,
-    limit: count || 3,
-    overrideAccess: false,
-    sort: '-publishedAt',
-    where: {
-      _status: {
-        equals: 'published',
-      },
-    },
-  })
+  const stories = await getCachedStories(count || 3)
 
   if (!stories.docs || stories.docs.length === 0) {
     return null
