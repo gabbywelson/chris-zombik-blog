@@ -48,4 +48,3 @@ export const revalidateDelete: CollectionAfterDeleteHook<ShortStory> = ({
 
   return doc
 }
-

@@ -25,7 +25,7 @@ const getCachedStories = unstable_cache(
     })
   },
   ['latest-works'],
-  { tags: ['short-stories'], revalidate: 3600 }
+  { tags: ['short-stories'], revalidate: 3600 },
 )
 
 export const LatestWorksBlock: React.FC<LatestWorksBlockType> = async ({
@@ -72,4 +72,3 @@ export const LatestWorksBlock: React.FC<LatestWorksBlockType> = async ({
     </section>
   )
 }
-

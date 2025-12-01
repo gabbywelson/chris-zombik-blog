@@ -142,4 +142,3 @@ const queryStoryBySlug = cache(async ({ slug }: { slug: string }) => {
 
   return result.docs?.[0] || null
 })
-

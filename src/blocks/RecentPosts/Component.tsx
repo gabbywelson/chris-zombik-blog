@@ -32,7 +32,7 @@ const getCachedPosts = unstable_cache(
     })
   },
   ['recent-posts'],
-  { tags: ['posts'], revalidate: 3600 }
+  { tags: ['posts'], revalidate: 3600 },
 )
 
 export const RecentPostsBlock: React.FC<RecentPostsBlockType> = async ({
@@ -62,12 +62,7 @@ export const RecentPostsBlock: React.FC<RecentPostsBlockType> = async ({
         {/* Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.docs.map((post) => (
-            <Card
-              key={post.id}
-              doc={post}
-              relationTo="posts"
-              showCategories
-            />
+            <Card key={post.id} doc={post} relationTo="posts" showCategories />
           ))}
         </div>
 
@@ -84,4 +79,3 @@ export const RecentPostsBlock: React.FC<RecentPostsBlockType> = async ({
     </section>
   )
 }
-
