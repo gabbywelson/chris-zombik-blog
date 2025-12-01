@@ -8,8 +8,14 @@ import { CMSLink } from '@/components/Link'
 import Link from 'next/link'
 import { SearchIcon } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { cn } from '@/utilities/ui'
 
-export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
+interface HeaderNavProps {
+  data: HeaderType
+  isOverHero?: boolean
+}
+
+export const HeaderNav: React.FC<HeaderNavProps> = ({ data, isOverHero }) => {
   const navItems = data?.navItems || []
 
   return (
@@ -20,15 +26,28 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
             key={i}
             {...link}
             appearance="link"
-            className="text-foreground/80 hover:text-foreground transition-colors tracking-wide"
+            className={cn(
+              'transition-colors tracking-wide',
+              isOverHero
+                ? 'text-white/80 hover:text-white'
+                : 'text-foreground/80 hover:text-foreground',
+            )}
           />
         )
       })}
-      <Link href="/search" className="text-foreground/70 hover:text-foreground transition-colors">
+      <Link
+        href="/search"
+        className={cn(
+          'transition-colors',
+          isOverHero
+            ? 'text-white/70 hover:text-white'
+            : 'text-foreground/70 hover:text-foreground',
+        )}
+      >
         <span className="sr-only">Search</span>
         <SearchIcon className="w-4 h-4 md:w-5 md:h-5" />
       </Link>
-      <ThemeToggle />
+      <ThemeToggle isOverHero={isOverHero} />
     </nav>
   )
 }

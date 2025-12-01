@@ -3,8 +3,13 @@
 import React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from '@/providers/Theme'
+import { cn } from '@/utilities/ui'
 
-export const ThemeToggle: React.FC = () => {
+interface ThemeToggleProps {
+  isOverHero?: boolean
+}
+
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isOverHero }) => {
   const { setTheme, theme } = useTheme()
 
   const toggleTheme = () => {
@@ -18,7 +23,10 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center justify-center p-2 text-foreground/80 hover:text-foreground transition-colors"
+      className={cn(
+        'relative flex items-center justify-center p-2 transition-colors',
+        isOverHero ? 'text-white/80 hover:text-white' : 'text-foreground/80 hover:text-foreground',
+      )}
       aria-label="Toggle theme"
     >
       <span className="sr-only">Toggle theme</span>
@@ -27,4 +35,3 @@ export const ThemeToggle: React.FC = () => {
     </button>
   )
 }
-
