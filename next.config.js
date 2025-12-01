@@ -6,18 +6,31 @@ const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : undefined || process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
 
+// Custom domain - client-side navigation uses window.location.hostname
+const CUSTOM_DOMAIN = process.env.NEXT_PUBLIC_CUSTOM_DOMAIN || 'www.chriszombik.com'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
+      // Vercel project URL (used by server-side rendering)
+      ...[NEXT_PUBLIC_SERVER_URL].filter(Boolean).map((item) => {
         const url = new URL(item)
-
         return {
           hostname: url.hostname,
           protocol: url.protocol.replace(':', ''),
         }
       }),
+      // Custom domain (used by client-side navigation)
+      {
+        hostname: CUSTOM_DOMAIN,
+        protocol: 'https',
+      },
+      // Non-www version of custom domain
+      {
+        hostname: CUSTOM_DOMAIN.replace('www.', ''),
+        protocol: 'https',
+      },
     ],
   },
   webpack: (webpackConfig) => {
