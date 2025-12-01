@@ -85,13 +85,10 @@ export class FootnoteNode extends DecoratorNode<JSX.Element | null> {
     element.className = 'footnote-ref-wrapper'
     element.setAttribute('data-footnote', 'true')
     element.setAttribute('data-footnote-id', this.__id)
-    element.style.display = 'inline'
     return element
   }
 
   decorate(editor: LexicalEditor, config: EditorConfig): JSX.Element | null {
-    // Return null here - the actual decoration is handled by the replacement mechanism
-    // in the client feature where we specify a different node class
     return null
   }
 
@@ -100,7 +97,7 @@ export class FootnoteNode extends DecoratorNode<JSX.Element | null> {
     element.setAttribute('data-footnote', 'true')
     element.setAttribute('data-footnote-id', this.__id)
     element.setAttribute('data-footnote-content', this.__fields.content)
-    element.textContent = '[*]' // Placeholder, actual number calculated at render time
+    element.textContent = '[*]'
     return { element }
   }
 

@@ -3,79 +3,70 @@
 import type { LexicalCommand } from '@payloadcms/richtext-lexical/lexical'
 import type { JSX } from 'react'
 
-import { LexicalComposerContext } from '@lexical/react/LexicalComposerContext.js'
-import { formatDrawerSlug, useEditDepth } from '@payloadcms/ui'
+import { LexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_EDITOR,
   createCommand,
+  $getNodeByKey,
 } from '@payloadcms/richtext-lexical/lexical'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
-import { FieldsDrawer } from '@payloadcms/richtext-lexical/client'
-import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
-import { useLexicalDrawer } from '@payloadcms/richtext-lexical/client'
+import {
+  $createClientFootnoteNode,
+  $isClientFootnoteNode,
+  ClientFootnoteNode,
+} from './ClientFootnoteNode'
+import { FootnoteModal } from './FootnoteModal'
 
-import { $createClientFootnoteNode, $isClientFootnoteNode } from './ClientFootnoteNode'
-
-type FootnoteDrawerPayload = {
+type FootnotePayload = {
   nodeKey?: string
 }
 
 export const INSERT_FOOTNOTE_COMMAND: LexicalCommand<void> =
   createCommand('INSERT_FOOTNOTE_COMMAND')
-export const OPEN_FOOTNOTE_DRAWER_COMMAND: LexicalCommand<FootnoteDrawerPayload> = createCommand(
-  'OPEN_FOOTNOTE_DRAWER_COMMAND',
+export const OPEN_FOOTNOTE_MODAL_COMMAND: LexicalCommand<FootnotePayload> = createCommand(
+  'OPEN_FOOTNOTE_MODAL_COMMAND',
 )
 
 // Inner component that requires the Lexical context
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function FootnotePluginInner({ editor }: { editor: any }): JSX.Element {
-  const editDepth = useEditDepth()
-  const {
-    fieldProps: { schemaPath },
-    uuid,
-  } = useEditorConfigContext()
-
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingNodeKey, setEditingNodeKey] = useState<string | null>(null)
   const [initialContent, setInitialContent] = useState<string>('')
 
-  const drawerSlug = formatDrawerSlug({
-    slug: `lexical-footnote-${uuid}`,
-    depth: editDepth,
-  })
-
-  const { toggleDrawer, closeDrawer } = useLexicalDrawer(drawerSlug, true)
-
-  const handleDrawerSubmit = useCallback(
-    (fields: any, data: any) => {
-      const content = data.content as string
-
+  const handleModalSubmit = useCallback(
+    (content: string) => {
       editor.update(() => {
         if (editingNodeKey) {
           // Editing existing footnote
-          const node = editor.getEditorState()._nodeMap.get(editingNodeKey)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if (node && $isClientFootnoteNode(node as any)) {
-            ;(node as any).setFields({ content })
+          const node = $getNodeByKey(editingNodeKey)
+          if (node && $isClientFootnoteNode(node)) {
+            node.setFields({ content })
           }
         } else {
           // Creating new footnote
           const selection = $getSelection()
           if ($isRangeSelection(selection)) {
             const footnoteNode = $createClientFootnoteNode({ content })
-            selection.insertNodes([footnoteNode as any])
+            selection.insertNodes([footnoteNode])
           }
         }
       })
 
       setEditingNodeKey(null)
       setInitialContent('')
-      closeDrawer()
+      setIsModalOpen(false)
     },
-    [editor, editingNodeKey, closeDrawer],
+    [editor, editingNodeKey],
   )
+
+  const handleClose = useCallback(() => {
+    setEditingNodeKey(null)
+    setInitialContent('')
+    setIsModalOpen(false)
+  }, [])
 
   useEffect(() => {
     return editor.registerCommand(
@@ -83,48 +74,46 @@ function FootnotePluginInner({ editor }: { editor: any }): JSX.Element {
       () => {
         setEditingNodeKey(null)
         setInitialContent('')
-        toggleDrawer()
+        setIsModalOpen(true)
         return true
       },
       COMMAND_PRIORITY_EDITOR,
     )
-  }, [editor, toggleDrawer])
+  }, [editor])
 
   useEffect(() => {
     return editor.registerCommand(
-      OPEN_FOOTNOTE_DRAWER_COMMAND,
-      (payload: FootnoteDrawerPayload) => {
+      OPEN_FOOTNOTE_MODAL_COMMAND,
+      (payload: FootnotePayload) => {
         if (payload?.nodeKey) {
           // Edit existing footnote
           editor.getEditorState().read(() => {
-            const node = editor.getEditorState()._nodeMap.get(payload.nodeKey!)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if (node && $isClientFootnoteNode(node as any)) {
+            const node = $getNodeByKey(payload.nodeKey!)
+            if (node && $isClientFootnoteNode(node)) {
               setEditingNodeKey(payload.nodeKey!)
-              setInitialContent((node as any).getFields().content)
+              setInitialContent(node.getFields().content)
+              setIsModalOpen(true)
             }
           })
         } else {
           // New footnote
           setEditingNodeKey(null)
           setInitialContent('')
+          setIsModalOpen(true)
         }
-        toggleDrawer()
         return true
       },
       COMMAND_PRIORITY_EDITOR,
     )
-  }, [editor, toggleDrawer])
+  }, [editor])
 
   return (
-    <FieldsDrawer
-      drawerSlug={drawerSlug}
-      drawerTitle={editingNodeKey ? 'Edit Footnote' : 'Add Footnote'}
-      featureKey="footnote"
-      handleDrawerSubmit={handleDrawerSubmit}
-      schemaPath={schemaPath}
-      schemaPathSuffix="fields"
-      data={initialContent ? { content: initialContent } : undefined}
+    <FootnoteModal
+      isOpen={isModalOpen}
+      onClose={handleClose}
+      onSubmit={handleModalSubmit}
+      initialContent={initialContent}
+      title={editingNodeKey ? 'Edit Footnote' : 'Add Footnote'}
     />
   )
 }

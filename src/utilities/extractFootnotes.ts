@@ -1,4 +1,4 @@
-import type { SerializedLexicalNode } from 'lexical'
+import type { SerializedLexicalNode } from '@payloadcms/richtext-lexical/lexical'
 import type { SerializedFootnoteNode } from '@/lexical/footnotes/FootnoteNode'
 
 export type ExtractedFootnote = {
