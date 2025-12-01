@@ -3,7 +3,7 @@
 import type { LexicalCommand } from '@payloadcms/richtext-lexical/lexical'
 import type { JSX } from 'react'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { LexicalComposerContext } from '@lexical/react/LexicalComposerContext.js'
 import { formatDrawerSlug, useEditDepth } from '@payloadcms/ui'
 import {
   $getSelection,
@@ -11,7 +11,7 @@ import {
   COMMAND_PRIORITY_EDITOR,
   createCommand,
 } from '@payloadcms/richtext-lexical/lexical'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 
 import { FieldsDrawer } from '@payloadcms/richtext-lexical/client'
 import { useEditorConfigContext } from '@payloadcms/richtext-lexical/client'
@@ -29,8 +29,9 @@ export const OPEN_FOOTNOTE_DRAWER_COMMAND: LexicalCommand<FootnoteDrawerPayload>
   'OPEN_FOOTNOTE_DRAWER_COMMAND',
 )
 
-export function FootnotePlugin(): JSX.Element {
-  const [editor] = useLexicalComposerContext()
+// Inner component that requires the Lexical context
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function FootnotePluginInner({ editor }: { editor: any }): JSX.Element {
   const editDepth = useEditDepth()
   const {
     fieldProps: { schemaPath },
@@ -126,4 +127,18 @@ export function FootnotePlugin(): JSX.Element {
       data={initialContent ? { content: initialContent } : undefined}
     />
   )
+}
+
+// Wrapper component that safely checks for Lexical context
+export function FootnotePlugin(): JSX.Element | null {
+  const composerContext = useContext(LexicalComposerContext)
+
+  // If no context available, render nothing
+  if (!composerContext) {
+    return null
+  }
+
+  const [editor] = composerContext
+
+  return <FootnotePluginInner editor={editor} />
 }

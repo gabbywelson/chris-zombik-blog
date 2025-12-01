@@ -13,6 +13,11 @@ const CUSTOM_DOMAIN = process.env.NEXT_PUBLIC_CUSTOM_DOMAIN || 'www.chriszombik.
 const nextConfig = {
   images: {
     remotePatterns: [
+      // Localhost for development
+      {
+        hostname: 'localhost',
+        protocol: 'http',
+      },
       // Vercel project URL (used by server-side rendering)
       ...[NEXT_PUBLIC_SERVER_URL].filter(Boolean).map((item) => {
         const url = new URL(item)
