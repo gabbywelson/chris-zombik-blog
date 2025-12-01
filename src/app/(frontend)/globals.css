@@ -106,3 +106,28 @@ html[data-theme='dark'],
 html[data-theme='light'] {
   opacity: initial;
 }
+
+/* Footnote styles */
+@layer components {
+  .footnote-ref {
+    @apply inline-flex items-center text-xs font-medium;
+  }
+
+  .footnote-ref a {
+    @apply transition-colors duration-150;
+  }
+
+  .footnote-ref a:hover {
+    @apply underline;
+  }
+
+  /* Smooth scroll for footnote navigation */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Highlight target footnote when navigating */
+  .footnotes-section li:target {
+    @apply bg-accent/30 -mx-3 px-3 py-1 rounded transition-colors duration-300;
+  }
+}

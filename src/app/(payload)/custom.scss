@@ -1,0 +1,16 @@
+/* Footnote styles for the Payload admin Lexical editor */
+.footnote-ref {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--theme-elevation-800);
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: 2px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--theme-elevation-100);
+  }
+}

@@ -7,6 +7,8 @@ import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import RichText from '@/components/RichText'
+import { FootnotesSection } from '@/components/FootnotesSection'
+import { extractFootnotes } from '@/utilities/extractFootnotes'
 
 import type { Post } from '@/payload-types'
 
@@ -51,6 +53,9 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   if (!post) return <PayloadRedirects url={url} />
 
+  // Extract footnotes from the post content
+  const footnotes = extractFootnotes(post.content as any)
+
   return (
     <article className="pt-16 pb-16">
       <PageClient />
@@ -65,6 +70,10 @@ export default async function Post({ params: paramsPromise }: Args) {
       <div className="flex flex-col items-center gap-4 pt-8">
         <div className="container">
           <RichText className="max-w-[48rem] mx-auto" data={post.content} enableGutter={false} />
+
+          {/* Footnotes Section */}
+          <FootnotesSection footnotes={footnotes} className="max-w-[48rem] mx-auto" />
+
           {post.relatedPosts && post.relatedPosts.length > 0 && (
             <RelatedPosts
               className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
