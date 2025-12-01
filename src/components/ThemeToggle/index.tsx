@@ -20,6 +20,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isOverHero }) => {
     }
   }
 
+  const isDark = theme === 'dark'
+
   return (
     <button
       onClick={toggleTheme}
@@ -27,11 +29,21 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isOverHero }) => {
         'relative flex items-center justify-center p-2 transition-colors',
         isOverHero ? 'text-white/80 hover:text-white' : 'text-foreground/80 hover:text-foreground',
       )}
-      aria-label="Toggle theme"
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      <span className="sr-only">Toggle theme</span>
-      <Sun className="w-5 h-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute w-5 h-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="sr-only">{isDark ? 'Switch to light mode' : 'Switch to dark mode'}</span>
+      <Sun
+        className={cn(
+          'w-5 h-5 transition-all',
+          isDark ? '-rotate-90 scale-0' : 'rotate-0 scale-100',
+        )}
+      />
+      <Moon
+        className={cn(
+          'absolute w-5 h-5 transition-all',
+          isDark ? 'rotate-0 scale-100' : 'rotate-90 scale-0',
+        )}
+      />
     </button>
   )
 }
