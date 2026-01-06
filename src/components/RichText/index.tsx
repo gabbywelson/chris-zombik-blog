@@ -15,9 +15,11 @@ import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
 
 import type {
   BannerBlock as BannerBlockProps,
+  BlockQuoteBlock as BlockQuoteBlockProps,
   CallToActionBlock as CTABlockProps,
   MediaBlock as MediaBlockProps,
 } from '@/payload-types'
+import { BlockQuoteBlock } from '@/blocks/BlockQuote/Component'
 import type { SerializedFootnoteNode } from '@/lexical/footnotes/FootnoteNode'
 import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
@@ -26,7 +28,9 @@ import { extractFootnotes, createFootnoteNumberMap } from '@/utilities/extractFo
 
 type NodeTypes =
   | DefaultNodeTypes
-  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps>
+  | SerializedBlockNode<
+      CTABlockProps | MediaBlockProps | BannerBlockProps | BlockQuoteBlockProps | CodeBlockProps
+    >
   | SerializedFootnoteNode
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
@@ -46,6 +50,7 @@ function createJsxConverters(
     ...LinkJSXConverter({ internalDocToHref }),
     blocks: {
       banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,
+      blockQuote: ({ node }) => <BlockQuoteBlock className="col-start-2 mb-4" {...node.fields} />,
       mediaBlock: ({ node }) => (
         <MediaBlock
           className="col-start-1 col-span-3"
