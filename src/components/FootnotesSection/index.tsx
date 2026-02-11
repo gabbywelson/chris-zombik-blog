@@ -1,3 +1,4 @@
+import RichText from '@/components/RichText'
 import type { ExtractedFootnote } from '@/utilities/extractFootnotes'
 
 type Props = {
@@ -21,7 +22,11 @@ export function FootnotesSection({ footnotes, className = '' }: Props) {
           <li key={footnote.id} id={`footnote-${footnote.id}`} className="flex gap-3">
             <span className="text-primary font-medium shrink-0">[{footnote.number}]</span>
             <span className="flex-1">
-              {footnote.content}
+              {typeof footnote.content === 'string' ? (
+                footnote.content
+              ) : (
+                <RichText data={footnote.content} enableGutter={false} enableProse={false} />
+              )}
               <a
                 href={`#footnote-ref-${footnote.id}`}
                 className="ml-2 text-primary hover:text-primary/80 no-underline"
@@ -37,4 +42,3 @@ export function FootnotesSection({ footnotes, className = '' }: Props) {
     </section>
   )
 }
-

@@ -11,6 +11,7 @@ import {
 
 import { authenticated } from '../../access/authenticated'
 import { FootnoteFeature } from '../../lexical/footnotes/feature.server'
+import { FootnoteReference } from '../../blocks/FootnoteReference/config'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { BlockQuote } from '../../blocks/BlockQuote/config'
@@ -92,10 +93,14 @@ export const Posts: CollectionConfig<'posts'> = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, BlockQuote, Code, MediaBlock] }),
+                    BlocksFeature({
+                      blocks: [Banner, BlockQuote, Code, MediaBlock],
+                      inlineBlocks: [FootnoteReference],
+                    }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),
+                    // Legacy compatibility for existing footnote nodes
                     FootnoteFeature(),
                   ]
                 },
