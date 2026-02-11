@@ -42,12 +42,58 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   return relationTo === 'posts' ? `/posts/${slug}` : `/${slug}`
 }
 
+const INDENT_SIZE_REM = 2.5
+
+const getIndentStyle = (indent?: number): React.CSSProperties | undefined => {
+  if (!indent || indent <= 0) {
+    return undefined
+  }
+
+  return {
+    marginInlineStart: `${indent * INDENT_SIZE_REM}rem`,
+  }
+}
+
 function createJsxConverters(
   footnoteNumberMap: Map<string, number>,
 ): JSXConvertersFunction<NodeTypes> {
   return ({ defaultConverters }) => ({
     ...defaultConverters,
     ...LinkJSXConverter({ internalDocToHref }),
+    paragraph: ({ node, nodesToJSX }) => {
+      const children = nodesToJSX({ nodes: node.children })
+
+      if (!children?.length) {
+        return (
+          <p style={getIndentStyle(node.indent)}>
+            <br />
+          </p>
+        )
+      }
+
+      return <p style={getIndentStyle(node.indent)}>{children}</p>
+    },
+    heading: ({ node, nodesToJSX }) => {
+      const children = nodesToJSX({ nodes: node.children })
+      const NodeTag = node.tag
+
+      return <NodeTag style={getIndentStyle(node.indent)}>{children}</NodeTag>
+    },
+    quote: ({ node, nodesToJSX }) => {
+      const children = nodesToJSX({ nodes: node.children })
+
+      return <blockquote style={getIndentStyle(node.indent)}>{children}</blockquote>
+    },
+    list: ({ node, nodesToJSX }) => {
+      const children = nodesToJSX({ nodes: node.children })
+      const NodeTag = node.tag
+
+      return (
+        <NodeTag className={`list-${node?.listType}`} style={getIndentStyle(node.indent)}>
+          {children}
+        </NodeTag>
+      )
+    },
     blocks: {
       banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,
       blockQuote: ({ node }) => <BlockQuoteBlock className="col-start-2 mb-4" {...node.fields} />,
@@ -93,7 +139,7 @@ export default function RichText(props: Props) {
   const { className, enableProse = true, enableGutter = true, data, ...rest } = props
 
   // Extract footnotes and create number map for this content
-  const footnotes = extractFootnotes(data as any)
+  const footnotes = extractFootnotes(data)
   const footnoteNumberMap = createFootnoteNumberMap(footnotes)
   const jsxConverters = createJsxConverters(footnoteNumberMap)
 
