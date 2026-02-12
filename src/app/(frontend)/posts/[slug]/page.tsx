@@ -57,7 +57,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   if (!post) return <PayloadRedirects url={url} />
 
   // Extract footnotes from the post content
-  const footnotes = extractFootnotes(post.content as any)
+  const footnotes = extractFootnotes(post.content)
 
   return (
     <article className="pt-16 pb-16">

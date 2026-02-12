@@ -1,41 +1,71 @@
+import type { DefaultTypedEditorState, SerializedInlineBlockNode } from '@payloadcms/richtext-lexical'
 import type { SerializedLexicalNode } from '@payloadcms/richtext-lexical/lexical'
+
 import type { SerializedFootnoteNode } from '@/lexical/footnotes/FootnoteNode'
 
+type FootnoteInlineBlockFields = {
+  blockName?: string
+  blockType: 'footnoteReference'
+  content: DefaultTypedEditorState
+}
+
 export type ExtractedFootnote = {
+  content: DefaultTypedEditorState | string
   id: string
-  content: string
   number: number
+}
+
+function isLegacyFootnoteNode(node: SerializedLexicalNode): node is SerializedFootnoteNode {
+  return node.type === 'footnote'
+}
+
+function isFootnoteInlineBlockNode(
+  node: SerializedLexicalNode,
+): node is SerializedInlineBlockNode<FootnoteInlineBlockFields> {
+  if (node.type !== 'inlineBlock') {
+    return false
+  }
+
+  const fields = (node as SerializedInlineBlockNode<FootnoteInlineBlockFields>).fields
+  return fields?.blockType === 'footnoteReference' && typeof fields?.id === 'string'
 }
 
 /**
  * Recursively extracts all footnotes from Lexical content in document order.
- * Returns an array of footnotes with their assigned numbers.
+ * Supports both legacy `footnote` nodes and new `footnoteReference` inline blocks.
  */
-export function extractFootnotes(content: {
-  root: {
-    children: SerializedLexicalNode[]
-    [key: string]: unknown
-  }
-  [key: string]: unknown
-}): ExtractedFootnote[] {
+export function extractFootnotes(content?: DefaultTypedEditorState | null): ExtractedFootnote[] {
   const footnotes: ExtractedFootnote[] = []
   const seenIds = new Set<string>()
 
+  function pushFootnote(footnote: Omit<ExtractedFootnote, 'number'>) {
+    if (seenIds.has(footnote.id)) {
+      return
+    }
+
+    seenIds.add(footnote.id)
+    footnotes.push({
+      ...footnote,
+      number: footnotes.length + 1,
+    })
+  }
+
   function traverse(nodes: SerializedLexicalNode[]) {
     for (const node of nodes) {
-      if (node.type === 'footnote') {
-        const footnoteNode = node as SerializedFootnoteNode
-        if (!seenIds.has(footnoteNode.id)) {
-          seenIds.add(footnoteNode.id)
-          footnotes.push({
-            id: footnoteNode.id,
-            content: footnoteNode.fields.content,
-            number: footnotes.length + 1,
-          })
-        }
+      if (isLegacyFootnoteNode(node)) {
+        pushFootnote({
+          id: node.id,
+          content: node.fields.content,
+        })
       }
 
-      // Recursively check children if they exist
+      if (isFootnoteInlineBlockNode(node)) {
+        pushFootnote({
+          id: node.fields.id,
+          content: node.fields.content,
+        })
+      }
+
       if ('children' in node && Array.isArray(node.children)) {
         traverse(node.children as SerializedLexicalNode[])
       }
@@ -43,15 +73,12 @@ export function extractFootnotes(content: {
   }
 
   if (content?.root?.children) {
-    traverse(content.root.children)
+    traverse(content.root.children as SerializedLexicalNode[])
   }
 
   return footnotes
 }
 
-/**
- * Creates a map from footnote ID to footnote number for quick lookup.
- */
 export function createFootnoteNumberMap(footnotes: ExtractedFootnote[]): Map<string, number> {
   const map = new Map<string, number>()
   for (const footnote of footnotes) {

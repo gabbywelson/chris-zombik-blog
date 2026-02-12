@@ -1,13 +1,15 @@
 'use client'
 
-import type { EditorConfig, LexicalEditor, NodeKey, SerializedLexicalNode, Spread } from '@payloadcms/richtext-lexical/lexical'
+import type {
+  EditorConfig,
+  LexicalEditor,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread,
+} from '@payloadcms/richtext-lexical/lexical'
 import { DecoratorNode, $applyNodeReplacement } from '@payloadcms/richtext-lexical/lexical'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import * as React from 'react'
 import type { JSX } from 'react'
 import ObjectID from 'bson-objectid'
-
-import { OPEN_FOOTNOTE_MODAL_COMMAND } from './FootnotePlugin'
 
 export type FootnoteFields = {
   content: string
@@ -22,35 +24,19 @@ export type SerializedFootnoteNode = Spread<
   SerializedLexicalNode
 >
 
-// Client-side component for rendering footnotes in the editor
-function FootnoteEditorComponent({
-  content,
-  nodeKey,
-}: {
-  content: string
-  nodeKey: string
-}): JSX.Element {
-  const [editor] = useLexicalComposerContext()
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    editor.dispatchCommand(OPEN_FOOTNOTE_MODAL_COMMAND, { nodeKey })
-  }
-
+function FootnoteEditorComponent({ content }: { content: string }): JSX.Element {
   return (
     <sup
-      className="footnote-ref cursor-pointer text-blue-600 dark:text-blue-400 hover:underline select-none"
+      className="footnote-ref select-none"
       title={content}
-      onClick={handleClick}
     >
-      [*]
+      [legacy footnote]
     </sup>
   )
 }
 
 /**
- * Client-side FootnoteNode with proper React decoration for the Lexical editor.
+ * Legacy client-side FootnoteNode kept for backward compatibility with older post content.
  */
 export class ClientFootnoteNode extends DecoratorNode<JSX.Element> {
   __fields: FootnoteFields
@@ -81,7 +67,7 @@ export class ClientFootnoteNode extends DecoratorNode<JSX.Element> {
     })
   }
 
-  createDOM(config: EditorConfig): HTMLElement {
+  createDOM(_config: EditorConfig): HTMLElement {
     const element = document.createElement('span')
     element.className = 'footnote-ref-wrapper'
     return element
@@ -91,13 +77,8 @@ export class ClientFootnoteNode extends DecoratorNode<JSX.Element> {
     return false
   }
 
-  decorate(editor: LexicalEditor, config: EditorConfig): JSX.Element {
-    return (
-      <FootnoteEditorComponent
-        content={this.__fields.content}
-        nodeKey={this.__key}
-      />
-    )
+  decorate(_editor: LexicalEditor, _config: EditorConfig): JSX.Element {
+    return <FootnoteEditorComponent content={this.__fields.content} />
   }
 
   exportJSON(): SerializedFootnoteNode {
@@ -147,8 +128,6 @@ export function $createClientFootnoteNode({
   )
 }
 
-export function $isClientFootnoteNode(
-  node: unknown,
-): node is ClientFootnoteNode {
+export function $isClientFootnoteNode(node: unknown): node is ClientFootnoteNode {
   return node instanceof ClientFootnoteNode
 }

@@ -2,6 +2,7 @@ import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import {
   DefaultNodeTypes,
   SerializedBlockNode,
+  SerializedInlineBlockNode,
   SerializedLinkNode,
   type DefaultTypedEditorState,
 } from '@payloadcms/richtext-lexical'
@@ -24,13 +25,20 @@ import type { SerializedFootnoteNode } from '@/lexical/footnotes/FootnoteNode'
 import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { cn } from '@/utilities/ui'
-import { extractFootnotes, createFootnoteNumberMap } from '@/utilities/extractFootnotes'
+import { createFootnoteNumberMap, extractFootnotes } from '@/utilities/extractFootnotes'
+
+type FootnoteInlineBlockFields = {
+  blockName?: string
+  blockType: 'footnoteReference'
+  content: DefaultTypedEditorState
+}
 
 type NodeTypes =
   | DefaultNodeTypes
   | SerializedBlockNode<
       CTABlockProps | MediaBlockProps | BannerBlockProps | BlockQuoteBlockProps | CodeBlockProps
     >
+  | SerializedInlineBlockNode<FootnoteInlineBlockFields>
   | SerializedFootnoteNode
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
@@ -109,6 +117,23 @@ function createJsxConverters(
       ),
       code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
       cta: ({ node }) => <CallToActionBlock {...node.fields} />,
+    },
+    inlineBlocks: {
+      footnoteReference: ({ node }) => {
+        const number = footnoteNumberMap.get(node.fields.id) ?? 0
+        return (
+          <sup className="footnote-ref">
+            <a
+              href={`#footnote-${node.fields.id}`}
+              id={`footnote-ref-${node.fields.id}`}
+              className="text-primary hover:text-primary/80 no-underline"
+              aria-label={`Footnote ${number}`}
+            >
+              [{number}]
+            </a>
+          </sup>
+        )
+      },
     },
     footnote: ({ node }) => {
       const footnoteNode = node as SerializedFootnoteNode
